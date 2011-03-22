@@ -5,6 +5,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage[pdftex]{color, graphicx}
 
 \author{Piotr Dobrowolski, 291528}
 \title{Serwis cytatów - sentencji \\ Opis protokołu}
@@ -35,8 +36,8 @@ Protokołu jest nastawiony na szybkość kosztem niezawodności dostarczanych te
 
 \section{Terminologia}
 \begin{description}
-\item[Klient: ] użytkownik instancji protokołu, który chce pobrać cytat,
-\item[Serwer: ] użytkownik udostępniający teksty klientom,
+\item[Klient: ] użytkownik instancji protokołu, który chce pobrać cytat z bazy utrzymywanej na serwerze,
+\item[Serwer: ] aplikacja użytkownika udostępniająca teksty klientom,
 \item[Cytat: ] będę używał wymiennie z tekst, sentencja. Są to dane tekstowe przesyłane protokołem,
 \item[Długi cytat: ] jest to cytat, który nie mieści się w jednym komunikacie, i należy go podzielić.
 %może dodać - klient oczekujący, klient rozpoznany, coś takiego?
@@ -44,17 +45,19 @@ Protokołu jest nastawiony na szybkość kosztem niezawodności dostarczanych te
 
 
 \section{Założenia}
-\subsection{Połączenie}
 Serwer odpowiada na żądania klientów. W jednej chwili może obsługiwać wielu na raz.
+Oraz może wysyłać wiele różnych cytatów do tego samego klienta w tej samej chwili.
+
+\subsection{Warstwa komunikacji}
+Protokół działa w warstwie aplikacji.
 \subsection{Wykorzystanie innych protokołów}
-Protokół działa w warstwie aplikacji. 
-Zależy nam na szybkości, a komunikacja nie musi być niezawodna,
-także do transportu będzie użyty protokół UDP.
+Protokół ma działać jak najszybciej, nie gwarantując niezawodności. Używany jest protokół UDP.
 \subsection{Model komunikacji}
 Protokół działa w modelu klient-serwer. Pojedynczy serwer z cytatami, udostępnia je wielu klientom.
 Jak przedstawiono na diagramie poniżej.
+Klient nasłuchuje na dynamicznie przydzielonym porcie. Serwer na porcie \verb+s_port+.
 \begin{center}
-\includegraphics[scale=0.6]{model.png}
+\includegraphics[scale=0.7]{model.png}
 \end{center}
 
 \section{Opis formatu komunikatów}
@@ -71,8 +74,9 @@ PART_ID_T {
    uint8    all_parts   = 1;
 }
 \end{verbatim}
-Typ ten służy do odróżnienia paczki z tekstem, tak aby później można było poskładać długi cytat w dobrej kolejności.\\
-Części \verb+part_nr+ numerowane są od $0$.
+Typ ten służy do odróżnienia komunikatu z tekstem, tak aby później można było poskładać długi cytat w dobrej kolejności.\\
+Części \verb+part_nr+ numerowane są od $0$ - oznacza numer kolejny części. \verb+all_parts+ - oznacza ilość, na którą został
+podzielony cytat.
 
 \begin{verbatim}
 QUOT_T {
@@ -95,12 +99,14 @@ Służy do wysłania do serwera prośby o cytat. Jest to pusta struktura.
 
 \begin{verbatim}
 QUOT_RESPONSE_MSG_T {
-   uint16      id;
+   uint8       id;
    QUOT_T      quotation;
 }
 \end{verbatim}
 Struktura komunikatu wysyłanego z serwera do klienta, \verb+id+ oznacza identyfikator wysłanego
-cytatu (aby nie dopuścić do wymieszania komunikatów).
+cytatu (aby nie dopuścić do wymieszania części różnych cytatów). Wartość \verb+id+ pozostawiam do wyboru implementującemu
+protokół, należy zadbać o różne identyfikatory dla pary klient-serwerem. Pomiędzy klientami
+identyfikatory mogą się powtarzać.
 
 \section{Opis wymienianych komunikatów}
 Protokół posługuje się dwoma komunikatami: \verb+QUOT_REQUEST_MSG+ i \verb+QUOT_RESPONSE_MSG+. 
@@ -116,27 +122,46 @@ Po odebraniu tego komunikatu serwer przygotowuje (losuje, dzieli) cytat i przech
 W komunikacie zawarty jest:
 \begin{itemize}
 \item \verb+id:+ identyfikator cytatu, potrzebny w celu jednoznacznej identyfikacji cytatu.
-\item \verb+quotation:+ dane, tekst zawierający cytat, \verb+quotataion.quot:+ zawiera tekst cytatu.
+\item \verb+quotation:+ dane, \verb+quotataion.quot:+ zawiera tekst cytatu.
 Znaki kodowane są za pomocą systemu UTF-8.
 \end{itemize}
 \section{Opis stanów}
-
+Protokół może działać w trybie bezstanowym. Jednak można
+wyróżnić różne stany, które mogą działać równolegle.
 \subsection{Klient}
-Klient wysyła żądanie do serwera (\verb+QUOT_REQUEST_MSG()+), w chwili oczekiwania jest w
-stanie \verb+WAIT_FOR_QUOT+ a następnie zbiera pakiety odebrane z serwera.
-Klient identyfikuje cytat po odebraniu pierwszej części (zapisuje id). I na podstawie id będzie dalej pobierał brakujące
-części.
+Klient początkowo zaczyna ze stanu \verb+IDDLE+.
+Wysyłania żądanie do serwera (\verb+QUOT_REQUEST_MSG()+), w chwili oczekiwania jest w
+stanie \verb+WAIT_FOR_QUOT+ a następnie zbiera pakiety odebrane z serwera \verb+COLLECT_QUOT+.
+
+Klient identyfikuje cytat po odebraniu pierwszej części (zapisuje id). I na podstawie tego
+identyfikatora będzie dalej łączył pobrane później części.
 Podczas wysłania żądania zostaje zainicjowane odliczanie czasu, jeżeli czas oczekiwania na części cytatu które nie doszły przekroczy 
-\verb+timeout+ to pobieranie cytatu zostaje anulowane. \verb+timeout+ ustalane jest przez autora implementacji.
+\verb+timeout+ sekund to pobieranie cytatu zostaje anulowane. \verb+timeout+ ustalane jest przez autora implementacji.
 \subsection{Serwer}
 Serwer odbiera od klientów żądania \verb+QUOT_REQUEST_MSG()+ Przydziela temu zapytaniu identyfikator.
 Następnie dzieli cytat (jeżeli jest długi) zgodnie z \verb+max_quot_length+
 i za pomocą komunikatów \\ \verb+QUOT_RESPONSE_MSG(id, quotation)+ wysyła wiadomość do danego klienta.
+Poniższe diagramy przedstawiają stany.
+\begin{center}
+\includegraphics[scale=2]{klient.png}
+\end{center}
+\begin{center}
+\includegraphics[scale=2]{serwer.png}
+\end{center}
+
 
 \section{Numery}
+\subsection{Stałe}
 \begin{itemize}
-\item \verb+max_quot_length = 1024+ ustalany w czasie kompilacji
-\item \verb+timeout = 3+ proponowany
+\item \verb+max_quot_length = 1024;+ ustalany w czasie kompilacji,
+\item \verb+timeout = 5;+ proponowany,
+\item \verb+s_port = 8078;+
+\end{itemize}
+\subsection{Kody błędów}
+\begin{itemize}
+\item \verb+ETIMEDOUT   = 0xffff;+ przekroczenie czasu oczekiwania przez klienta,
+\item \verb+ENETUNREACH = 0xfffe;+ sieć jest niedostępna,
+\item \verb+EBADMSG     = 0xfffd;+ gdy otrzymany komunikat jest niepoprawny,
 \end{itemize}
 
 \end{document}
