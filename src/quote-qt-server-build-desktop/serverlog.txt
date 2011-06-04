@@ -1,0 +1,39 @@
+[21:11:3;24-5-2011|1668155985]: Inicjalizuj?
+[21:11:3;24-5-2011|1668155985]: ??cz? si? z baz?
+[21:11:3;24-5-2011|1668155985]: Pobieram dane z bazy
+[21:11:7;24-5-2011|1668155985]: btn server start klikni?ty
+[21:11:10;24-5-2011|1668155985]: btn server stop klikni?ty
+[21:11:27;24-5-2011|1668155985]: Wykonuj? submit
+[21:13:6;24-5-2011|769569113]: Inicjalizuj?
+[21:13:6;24-5-2011|769569113]: ??cz? si? z baz?
+[21:13:6;24-5-2011|769569113]: Pobieram dane z bazy
+[21:16:5;24-5-2011|1102684632]: Inicjalizuj?
+[21:16:5;24-5-2011|1102684632]: ??cz? si? z baz?
+[21:16:5;24-5-2011|1102684632]: Pobieram dane z bazy
+[21:18:10;24-5-2011|1730939600]: Inicjalizuj?
+[21:18:10;24-5-2011|1730939600]: ??cz? si? z baz?
+[21:18:10;24-5-2011|1730939600]: Pobieram dane z bazy
+[21:18:32;24-5-2011|1730939600]: Wykonuj? submit
+[21:18:34;24-5-2011|1730939600]: Usuwam
+[21:18:36;24-5-2011|1730939600]: Wykonuj? submit
+[21:21:11;24-5-2011|365815856]: Inicjalizuj?
+[21:21:11;24-5-2011|365815856]: ??cz? si? z baz?
+[21:21:11;24-5-2011|365815856]: Pobieram dane z bazy
+[21:21:15;24-5-2011|365815856]: btn server start klikni?ty
+[21:21:16;24-5-2011|365815856]: Serwer startuje
+[21:21:23;24-5-2011|365815856]: btn server stop klikni?ty
+[21:21:24;24-5-2011|365815856]: Serwer konczy dzialanie
+[13:4:1;30-5-2011|1614540567]: Inicjalizuj?
+[13:4:1;30-5-2011|1614540567]: ??cz? si? z baz?
+[13:4:1;30-5-2011|1614540567]: Pobieram dane z bazy
+[13:4:11;30-5-2011|1614540567]: btn server start klikni?ty
+[13:4:12;30-5-2011|1614540567]: Serwer startuje
+[13:4:13;30-5-2011|1614540567]: btn server stop klikni?ty
+[13:4:13;30-5-2011|1614540567]: Serwer konczy dzialanie
+[15:38:8;4-6-2011|474733471]: Inicjalizuj?
+[15:38:8;4-6-2011|474733471]: ??cz? si? z baz?
+[15:38:8;4-6-2011|474733471]: Pobieram dane z bazy
+[15:38:41;4-6-2011|474733471]: btn server start klikni?ty
+[15:38:42;4-6-2011|474733471]: Serwer startuje
+[15:38:42;4-6-2011|474733471]: btn server stop klikni?ty
+[15:38:43;4-6-2011|474733471]: Serwer konczy dzialanie

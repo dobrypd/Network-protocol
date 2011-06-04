@@ -20,6 +20,7 @@ SOURCES += main.cpp\
 HEADERS  += mainserverwindow.h \
     db.h \
     utils.h \
-    server.h
+    server.h \
+    protocolconsts.h
 
 FORMS    += mainserverwindow.ui
