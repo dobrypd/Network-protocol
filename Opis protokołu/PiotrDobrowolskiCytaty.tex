@@ -8,7 +8,7 @@
 \usepackage[pdftex]{color, graphicx}
 
 \author{Piotr Dobrowolski, 291528}
-\title{Serwis cytatów - sentencji \\ Opis protokołu}
+\title{Serwis cytatów -- sentencji \\ Opis protokołu}
 \date{\today}
 \frenchspacing
 
@@ -18,7 +18,7 @@
 \clearpage
 
 \section{Streszczenie}
-Niniejszy dokument opisuje specyfikację protokołu serwisu cytatów-sentencji.
+Niniejszy dokument opisuje specyfikację protokołu serwisu cytatów -- sentencji.
 Składa się z następujących sekcji:
 \begin{itemize}
 \item opis celów protokołu,
@@ -39,7 +39,7 @@ Protokołu jest nastawiony na szybkość kosztem niezawodności dostarczanych te
 \item[Klient: ] użytkownik instancji protokołu, który chce pobrać cytat z bazy utrzymywanej na serwerze,
 \item[Serwer: ] aplikacja użytkownika udostępniająca teksty klientom,
 \item[Cytat: ] będę używał wymiennie z tekst, sentencja. Są to dane tekstowe przesyłane protokołem,
-\item[Długi cytat: ] jest to cytat, który nie mieści się w jednym komunikacie, i należy go podzielić.
+\item[Długi cytat: ] jest to cytat, który nie mieści się w jednym komunikacie i należy go podzielić.
 %może dodać - klient oczekujący, klient rozpoznany, coś takiego?
 \end{description}
 
@@ -91,11 +91,13 @@ Struktura zachowuje cytat (jedną z części cytatu długiego). Oraz identyfikat
 \subsection{Typy komunikatów}
 \begin{verbatim}
 QUOT_REQUEST_MSG_T {
-   /*empty messsage*/
+    uint8   version = version_one;
 }
 \end{verbatim}
 Zgłoszenie się klienta.
-Służy do wysłania do serwera prośby o cytat. Jest to pusta struktura.
+Służy do wysłania do serwera prośby o cytat.
+Pole \verb+version+ jest to aktualna wersja protokołu aplikacji klienta.
+Jest pozostawiona dla przyszłych wersji protokołu.
 
 \begin{verbatim}
 QUOT_RESPONSE_MSG_T {
@@ -108,14 +110,16 @@ cytatu (aby nie dopuścić do wymieszania części różnych cytatów). Wartoś�
 protokół, należy zadbać o różne identyfikatory dla pary klient-serwerem. Pomiędzy klientami
 identyfikatory mogą się powtarzać.
 
+
+
 \section{Opis wymienianych komunikatów}
 Protokół posługuje się dwoma komunikatami: \verb+QUOT_REQUEST_MSG+ i \verb+QUOT_RESPONSE_MSG+. 
 (W nawiasach podane są argumenty, a po dwukropku typ komunikatu).
 \subsection{Wysyłane przez klienta}
 \subsubsection{Zgłaszanie się do serwera}
 \verb+QUOT_REQUEST_MSG():     QUOT_REQUEST_MSG_T+\\
-Klient posługuje się pustym komunikat aby zgłosić chęć pobrania cytatu z serwera.
-Po odebraniu tego komunikatu serwer przygotowuje (losuje, dzieli) cytat i przechodzi do stanu wysyłania cytatu do tego klienta.
+Klient posługuje się tym komunikat aby zgłosić chęć pobrania cytatu z serwera.
+Po odebraniu komunikatu serwer przygotowuje (losuje, dzieli) cytat i przechodzi do stanu wysyłania cytatu do tego klienta.
 \subsection{Wysyłane przez serwer}
 \subsubsection{Komunikat z danymi}
 \verb+QUOT_RESPONSE_MSG(id, quotation):     QUOT_RESPONSE_MSG_T+\\
@@ -125,23 +129,35 @@ W komunikacie zawarty jest:
 \item \verb+quotation:+ dane, \verb+quotataion.quot:+ zawiera tekst cytatu.
 Znaki kodowane są za pomocą systemu UTF-8.
 \end{itemize}
+
+
 \section{Opis stanów}
-Protokół może działać w trybie bezstanowym. Jednak można
-wyróżnić różne stany, które mogą działać równolegle.
+W protokole występują stany tak jak na schematach poniżej. 
+Z założenia pozostawione zostało implementującemu w jaki sposób ma zostać
+obsłużona sytuacja braku komunikatu (nie dostarczenia całego 
+komunikatu) np. trzykrotne ponowienie pobrania komunikatu. 
+Stany protokołu opisują jedną operację pobrania / wysłania komunikatu.
+Poniżej rozpatruję stany protokołu występujące po stronie klienta i serwera.
 \subsection{Klient}
 Klient początkowo zaczyna ze stanu \verb+IDDLE+.
-Wysyłania żądanie do serwera (\verb+QUOT_REQUEST_MSG()+), w chwili oczekiwania jest w
+Użytkownik wysyła żądanie do serwera (\verb+QUOT_REQUEST_MSG()+), w chwili oczekiwania jest w
 stanie \verb+WAIT_FOR_QUOT+ a następnie zbiera pakiety odebrane z serwera \verb+COLLECT_QUOT+.
+Tak działa każde osobne pobranie cytatu.
 
 Klient identyfikuje cytat po odebraniu pierwszej części (zapisuje id). I na podstawie tego
 identyfikatora będzie dalej łączył pobrane później części.
 Podczas wysłania żądania zostaje zainicjowane odliczanie czasu, jeżeli czas oczekiwania na części cytatu które nie doszły przekroczy 
 \verb+timeout+ sekund to pobieranie cytatu zostaje anulowane. \verb+timeout+ ustalane jest przez autora implementacji.
 \subsection{Serwer}
-Serwer odbiera od klientów żądania \verb+QUOT_REQUEST_MSG()+ Przydziela temu zapytaniu identyfikator.
+Serwer odbiera od klientów żądania \verb+QUOT_REQUEST_MSG()+. Przydziela temu zapytaniu identyfikator.
 Następnie dzieli cytat (jeżeli jest długi) zgodnie z \verb+max_quot_length+
 i za pomocą komunikatów \\ \verb+QUOT_RESPONSE_MSG(id, quotation)+ wysyła wiadomość do danego klienta.
-Poniższe diagramy przedstawiają stany.
+Działanie serwera może być zakończone wyłącznie za pomocą przerwania.
+Wtedy jeżeli serwer jeżeli jest w stanie 'Oczekiwanie na klienta' to nie inicjuje odbierania
+\verb+QUOT_REQUEST_MSG+ tylko zakańcza swoje działanie. W każdym innym stanie serwer dokańcza to co rozpoczął --
+tak aby znaleźć się w 'Oczekiwanie na klienta'.
+
+Poniższe diagramy przedstawiają opisane wyżej stany.
 \begin{center}
 \includegraphics[scale=2]{klient.png}
 \end{center}
@@ -156,12 +172,15 @@ Poniższe diagramy przedstawiają stany.
 \item \verb+max_quot_length = 1024;+ ustalany w czasie kompilacji,
 \item \verb+timeout = 5;+ proponowany,
 \item \verb+s_port = 8078;+
+\item \verb+version_one = 1;+
 \end{itemize}
 \subsection{Kody błędów}
 \begin{itemize}
 \item \verb+ETIMEDOUT   = 0xffff;+ przekroczenie czasu oczekiwania przez klienta,
 \item \verb+ENETUNREACH = 0xfffe;+ sieć jest niedostępna,
 \item \verb+EBADMSG     = 0xfffd;+ gdy otrzymany komunikat jest niepoprawny,
+\item \verb+ESRVERR     = 0xfffc;+ błąd serwera --- w przypadku, gdy serwer 
+        nie może odesłać cytatu (np. gdy serwer nie może pobrać cytatu z bazy)
 \end{itemize}
 
 \end{document}
