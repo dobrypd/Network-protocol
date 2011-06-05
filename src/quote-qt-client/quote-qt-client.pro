@@ -16,6 +16,8 @@ SOURCES += main.cpp\
     client.cpp
 
 HEADERS  += mainclientwindow.h \
-    client.h
+    client.h \
+    ../quote-qt-server/protocolconsts.h \
+    protocolconsts.h
 
 FORMS    += mainclientwindow.ui

@@ -80,6 +80,11 @@ public:
         }
     }
 
+    virtual const char* what() const throw()
+    {
+       return "ERRNO exception: " + QString::number(errno).toAscii();
+    }
+
     quint8 getErrno() { return errno; }
 };
 

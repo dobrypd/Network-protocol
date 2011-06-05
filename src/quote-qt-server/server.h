@@ -30,7 +30,6 @@ private:
 
     QString* readQuotation();
     void initSocket();
-
     //send REPLY_MSG(key, index, parts, text) : CITE_MSG_T
     void sendQuotation(MSG_T request, QHostAddress& host, quint16 port);
     //send SERVER_ERR_MSG(errno) : ERR_MSG_T
