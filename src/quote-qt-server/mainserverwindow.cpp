@@ -47,8 +47,6 @@ MainServerWindow::~MainServerWindow()
 /*obsługa przycisków*/
 void MainServerWindow::btnSrvReset()
 {
-    QMessageBox::information(0, ("Uwaga"),
-        tr("Restart serwera"), QMessageBox::Ok);
     btnSrvStop();
     btnSrvStart();
 }
@@ -56,8 +54,6 @@ void MainServerWindow::btnSrvReset()
 void MainServerWindow::btnSrvStart()
 {
     log->addLog(UTF("btn server start kliknięty"));
-    QMessageBox::information(0, ("Uwaga"),
-        tr("Start serwera"), QMessageBox::Ok);
     ui->btnSrvReset->setEnabled(true);
     ui->btnSrvStop->setEnabled(true);
     ui->btnSrvStart->setEnabled(false);
@@ -79,8 +75,6 @@ void MainServerWindow::btnSrvStart()
 void MainServerWindow::btnSrvStop()
 {
     log->addLog(UTF("btn server stop kliknięty"));
-    QMessageBox::information(0, ("Uwaga"),
-        tr("Zatrzymanie serwera"), QMessageBox::Ok);
     ui->btnSrvReset->setEnabled(false);
     ui->btnSrvStop->setEnabled(false);
     ui->btnSrvStart->setEnabled(true);

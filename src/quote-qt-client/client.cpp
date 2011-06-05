@@ -1,4 +1,11 @@
 #include "client.h"
+#include <QMessageBox>
+/*debug*/
+void msg(QString msg){
+    QMessageBox::information(0, ("Uwaga"),
+        msg, QMessageBox::Ok);
+}
+/******/
 
 Client::Client(QMainWindow *wnd, QString addr, int port): wnd(wnd), addr(QHostAddress(addr)), port(port)
 {
@@ -19,11 +26,14 @@ void Client::initSocket()
 
 QString Client::getQuote(progressSetT prSet) throw(errnoException&)
 {
-    //wyslij prosbe
-    //odbieraj
     prSet(0);
+    MSG_T request;
+    request.key = 12;
+    request.msg_id = 1;
+    udpSocket->writeDatagram((char*)&request, sizeof(MSG_T), addr, port);
 
-    throw errnoException(E_USR1);
+    //throw errnoException(E_USR1);
+    //udpSocket->readDatagram()
 
     return "";
 }
