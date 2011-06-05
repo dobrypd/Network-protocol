@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += sql
+QT       += network
 
 TARGET = quote-qt-server
 TEMPLATE = app

@@ -35,8 +35,8 @@ typedef struct {
 } CITE_MSG_T;
 
 typedef struct {
-    uint8   msg_id;
-    uint8   errno;
+    quint8   msg_id;
+    quint8   errno;
 } ERR_MSG_T;
 
 #endif // PROTOCOLCONSTS_H

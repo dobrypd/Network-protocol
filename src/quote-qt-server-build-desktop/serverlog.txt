@@ -37,3 +37,20 @@
 [15:38:42;4-6-2011|474733471]: Serwer startuje
 [15:38:42;4-6-2011|474733471]: btn server stop klikni?ty
 [15:38:43;4-6-2011|474733471]: Serwer konczy dzialanie
+[1:21:38;5-6-2011|1281014258]: Inicjalizuj?
+[1:21:38;5-6-2011|1281014258]: ??cz? si? z baz?
+[1:21:38;5-6-2011|1281014258]: Pobieram dane z bazy
+[1:21:54;5-6-2011|1782910027]: Inicjalizuj?
+[1:21:54;5-6-2011|1782910027]: ??cz? si? z baz?
+[1:21:54;5-6-2011|1782910027]: Pobieram dane z bazy
+[1:21:55;5-6-2011|1782910027]: btn server start klikni?ty
+[1:21:56;5-6-2011|1782910027]: Serwer startuje
+[1:21:57;5-6-2011|1782910027]: btn server stop klikni?ty
+[1:21:58;5-6-2011|1782910027]: Serwer konczy dzialanie
+[1:29:54;5-6-2011|744299903]: Inicjalizuj?
+[1:29:54;5-6-2011|744299903]: ??cz? si? z baz?
+[1:29:54;5-6-2011|744299903]: Pobieram dane z bazy
+[1:29:56;5-6-2011|744299903]: btn server start klikni?ty
+[1:29:57;5-6-2011|744299903]: Serwer startuje
+[1:30:0;5-6-2011|744299903]: btn server stop klikni?ty
+[1:30:1;5-6-2011|744299903]: Serwer konczy dzialanie

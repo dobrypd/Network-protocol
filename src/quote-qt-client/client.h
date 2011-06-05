@@ -5,11 +5,14 @@ class Client
 {
 public:
     Client(QString addr, int port);
+    ~Client();
 
-    QString getQuote();
+    QString getQuote() ;
 private:
     QString addr;
     int port;
+    QUdpSocket* udpSocket;
+
 };
 
 #endif // CLIENT_H

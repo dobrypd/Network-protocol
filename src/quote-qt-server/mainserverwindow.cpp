@@ -73,7 +73,7 @@ void MainServerWindow::btnSrvStart()
         ui->edtPort->setText(QString::number(port));
     }
 
-    server = new Server(model, port, log);
+    server = new Server(this, model, port, log);
 }
 
 void MainServerWindow::btnSrvStop()

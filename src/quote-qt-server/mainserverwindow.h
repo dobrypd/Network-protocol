@@ -31,6 +31,7 @@ private slots:
     void btnResetDB();
     void btnDel();
     void btnOpenLogFile();
+    void readPendingDatagrams() { server->readPendingDatagrams(); }
 
 private:
     Ui::MainServerWindow *ui;
