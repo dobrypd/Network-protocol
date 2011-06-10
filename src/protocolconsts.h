@@ -49,6 +49,8 @@ const quint8 EREMOTEIO   = 121;
 const quint8 E_USR1      = 254;
 const quint8 E_USR2      = 255;
 
+const quint8 ETIMEOUT      = 1001;
+
 
 /*exceptions*/
 class errnoException: public std::exception
@@ -68,7 +70,7 @@ public:
             return UTF("Brak cytatów w bazie serwera");
             break;
         case EBADMSG:
-            return UTF("Brak wiadomości z danyymi");
+            return UTF("Brak wiadomości z danymi");
             break;
         case EREMOTEIO:
             return UTF("Serwer nie ma dostępu do bazy danych");
@@ -77,7 +79,10 @@ public:
             return UTF("Ta funkcja nie została zaimplementowana w Twojej wersji programu");
             break;
         case E_USR2:
-            return UTF("ERR2");
+            return UTF("Wystąlił błąd wewnętrzny programu.");
+            break;
+        case ETIMEOUT:
+            return UTF("Serwer nie odpowiada.");
             break;
         default:
             return UTF("Niezidentyfikowany błąd!");

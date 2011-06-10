@@ -8,27 +8,24 @@
 #include <QtNetwork/QUdpSocket>
 #include <QString>
 #include <QMainWindow>
+#include <QObject>
 //serwer dziala w oparciu o sygnaly okna dlatego jest tutaj QMainWindow
 
-class Server
+class Server: public QObject
 {
 public:
-    Server(QMainWindow *wnd, QSqlTableModel *model, int port, Log *log);
-
-    //public bo bedzie slotem polaczonym z sygnalem dotarcia
-    //read CITE_REQUEST_MSG(key) : MSG_T
-    void readPendingDatagrams();
-
-
+    Server(QMainWindow* wnd, QSqlTableModel *model, int port, Log *log);
     ~Server();
+
+    void readPendingDatagrams();
 private:
-    QMainWindow *wnd;
-    QSqlTableModel *model; //baza z cytatami
+    QSqlTableModel *model;  //baza z cytatami
+    QMainWindow* wnd;       //okno do ktorego moge podpiac udpSocket
     QUdpSocket* udpSocket;
     int port;
     Log* log;
 
-    QString* readQuotation();
+    QByteArray* readQuotation();
     void initSocket();
     //send REPLY_MSG(key, index, parts, text) : CITE_MSG_T
     void sendQuotation(MSG_T request, QHostAddress& host, quint16 port);

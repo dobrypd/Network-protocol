@@ -2,8 +2,16 @@
 
 #include <QtNetwork>
 
-Server::Server(QMainWindow *wnd, QSqlTableModel *model, int port, Log* log):
-    wnd(wnd), model(model), port(port), log(log)
+/*debug*/
+#include <QMessageBox>
+void msg(QString msg){
+    QMessageBox::information(0, ("Uwaga"),
+        msg, QMessageBox::Ok);
+}
+/******/
+
+Server::Server(QMainWindow* wnd, QSqlTableModel *model, int port, Log* log):
+    model(model), wnd(wnd), port(port), log(log)
 {
     //startuję serwer
     log->addLog("Serwer startuje");
@@ -17,11 +25,14 @@ Server::~Server()
     delete udpSocket;
 }
 
-QString* Server::readQuotation()
+QByteArray* Server::readQuotation()
 {
     log->addLog("rozpoczynam procedure readQuotation CITE_REQUEST_MSG(key) : MSG_T ");
-    QString* quote = new QString("to jest test");
-    log->addLog(QString("koncze procedure readQuotation wyrzucam cytat: '").append(quote));
+
+    QString temporary = "to jest tekst";
+    QByteArray* quote = new QByteArray(temporary.toUtf8());
+
+    log->addLog(QString("koncze procedure readQuotation wyrzucam cytat: ").append(quote->data()));
     return quote;
 }
 
@@ -30,10 +41,10 @@ void Server::initSocket()
     log->addLog("rozpoczynam initSocket");
 
     udpSocket = new QUdpSocket(wnd);
-    udpSocket->bind(QHostAddress::LocalHost, this->port);
+    udpSocket->bind(QHostAddress::LocalHost, port);
 
     log->addLog("Lacze sygnal ze slotem - rozpoczynam nasluchiwanie");
-    wnd->connect(udpSocket, SIGNAL(readyRead()),
+    udpSocket->connect(udpSocket, SIGNAL(readyRead()),
                  wnd, SLOT(readPendingDatagrams()));
 
     log->addLog("koncze initSocket");
@@ -54,7 +65,11 @@ void Server::readPendingDatagrams()
         udpSocket->readDatagram((char*)&requestMsg, requestMsgSize,
                                 &sender, &senderPort);
 
+        if (requestMsg.msg_id != CITE_REQUEST_MSG)
+            continue;
+
         //zmieniam stan na SEND_PART_STATE
+        log->addLog("Wysle cytat temu: " + sender.toString() + ":" +QString::number(senderPort));
         sendQuotation(requestMsg, sender, senderPort);
     }
 
@@ -68,16 +83,39 @@ void Server::sendQuotation(MSG_T request, QHostAddress& host, quint16 port)
                 + ":"
                 + QString::number(port));
 
-    QString *quot = readQuotation();
+    CITE_MSG_T msg;
+    CITE_PART_T part;
+    quint16 part_size = MAX_PART_SIZE;
+    QByteArray *quot = readQuotation();//w UTF8
+    QByteArray datagram(part_size, 0);
+    QDataStream stream(&datagram, QIODevice::WriteOnly);
+    stream.setVersion( QDataStream::Qt_4_0 );
+    quint16 parts = (quot->size() + sizeof(msg) + sizeof(quint16)) / MAX_PART_SIZE;
+    ::msg(QString::number(parts));
+    quint16 index = 0;
+
     if (quot == NULL){
         sendErrno(request, ENODATA, host, port);
         return;
     }
 
+    msg.parts = parts;
+    msg.msg_id = REPLY_MSG;
+    msg.key = request.key;
+    msg.text = part;
+
     /*wysylaj czesci*/
-    while (quot->size() > 0){
-        quot->clear();
+    for (index = 0; index < parts; index++){
+        msg.index = index;
+        part_size = std::min(MAX_PART_SIZE, (quint16)quot->size());
+        part.data_length = part_size;
+        part.data = ((char*) quot->data()) + index * MAX_PART_SIZE;
+        stream << msg.msg_id << msg.key << msg.index << msg.parts << msg.text.data_length;
+        //stream.writeBytes(, 100);//todo
+        udpSocket->writeDatagram(datagram, host, port);
+        datagram.clear();
     }
+
     delete quot;
 
     log->addLog("koncze sendQuotation dla hosta: "

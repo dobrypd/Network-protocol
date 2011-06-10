@@ -13,10 +13,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainclientwindow.cpp \
-    client.cpp
+    client.cpp \
+    rand64.cpp
 
 HEADERS  += mainclientwindow.h \
     client.h \
-    ../quote-qt-server/protocolconsts.h
+    ../quote-qt-server/protocolconsts.h \
+    rand64.h
 
 FORMS    += mainclientwindow.ui
