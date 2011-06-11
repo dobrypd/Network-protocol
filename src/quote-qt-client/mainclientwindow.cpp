@@ -33,9 +33,11 @@ void progressSetter(QProgressBar* prBar, int pr)
 
 void MainClientWindow::btnNewPressed()
 {
+    ui->quoteArea->setHtml(UTF("<p style=\"color=green;font-size=larger;\"><Ładowanie.../p>"));
+    QString q = UTF("Pusty cytat");
     try
     {
-        ui->quoteArea->setHtml(client->getQuote(boost::bind(progressSetter, ui->progressBar, _1)));
+        q = client->getQuote(boost::bind(progressSetter, ui->progressBar, _1));
 
     }
     catch (errnoException& e)
@@ -44,6 +46,8 @@ void MainClientWindow::btnNewPressed()
         ui->progressBar->setValue(ui->progressBar->minimum());
         return ;
     }
+
+    ui->quoteArea->setHtml(q);
 }
 
 void MainClientWindow::addrChanged(){

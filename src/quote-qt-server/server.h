@@ -30,7 +30,10 @@ private:
     //send REPLY_MSG(key, index, parts, text) : CITE_MSG_T
     void sendQuotation(MSG_T request, QHostAddress& host, quint16 port);
     //send SERVER_ERR_MSG(errno) : ERR_MSG_T
-    void sendErrno(MSG_T request, quint8 errno, QHostAddress& host, quint16 port);
+    void sendErrno(quint8 errno, QHostAddress& host, quint16 port);
+
+    char* nextPart(QByteArray* quote,quint16 index, quint16& size);
+    void sendPart(CITE_MSG_T& msg, QHostAddress& host, quint16 port);
 };
 
 #endif // SERVER_H

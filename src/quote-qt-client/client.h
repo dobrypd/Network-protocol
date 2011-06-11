@@ -26,8 +26,9 @@ private:
     rand64 r;
 
     void initSocket();
-    void downloadParts(QByteArray*& qparts,quint16& parts, quint64& quoteID, progressSetT prSet) throw(errnoException&);
+    void downloadParts(QByteArray** qparts,quint16& parts, quint64& quoteID, progressSetT prSet) throw(errnoException&);
     quint8 getNext(QByteArray& current, quint16& index, quint16& parts, quint64& quoteID);
+    CITE_MSG_T* cite_msgFromStream(QDataStream& stream);
 };
 
 #endif // CLIENT_H

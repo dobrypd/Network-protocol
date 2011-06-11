@@ -49,7 +49,8 @@ const quint8 EREMOTEIO   = 121;
 const quint8 E_USR1      = 254;
 const quint8 E_USR2      = 255;
 
-const quint8 ETIMEOUT      = 1001;
+const quint8 ETIMEOUT      = 1;
+const quint8 ESRVERR       = 2;
 
 
 /*exceptions*/
@@ -83,6 +84,9 @@ public:
             break;
         case ETIMEOUT:
             return UTF("Serwer nie odpowiada.");
+            break;
+        case ESRVERR:
+            return UTF("Server odpowiada niepoprawnie.");
             break;
         default:
             return UTF("Niezidentyfikowany błąd!");
